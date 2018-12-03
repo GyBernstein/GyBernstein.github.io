@@ -1,37 +1,34 @@
 ---
 layout: page
-title: About the Theme
-tags: [about, Jekyll, theme, moon]
-date: 2016-03-21
+title: Qun Li
+tags: [about, UGA, Qun]
+date: 2018-12-03
 comments: false
 ---
-    
-<center><a href="http://taylantatli.github.io/Moon"><b>Moon</b></a> is a minimal, one column jekyll theme.</center>
 
-## Features
-* Minimal, you can focus on your content
-* Responsive
-* Disqus integration
-* Syntax highlighting
-* Optional post image
-* Social icons
-* Page for sharing projects
-* Optional background image
-* Simple navigation menu
-* MathJax support
+***
+**Department of Mathematics**  
+_Franklin College of Arts and Sciences_  
+**UNIVERSITY OF GEORGIA**  
+***
 
-## Preview
+## EDUCATION
+* __Shandong University, Department of Mathematics,__  
+Shandong, China  
+Bachelor of Science  
+Sep, 2011–June, 2015
 
-{% capture images %}
-    https://cloud.githubusercontent.com/assets/754514/14509720/61c61058-01d6-11e6-93ab-0918515ecd56.png
-    https://cloud.githubusercontent.com/assets/754514/14509716/61ac6c8e-01d6-11e6-879f-8308883de790.png
-{% endcapture %}
-{% include gallery images=images caption="Screenshots of Moon Theme" cols=2 %}
+* __Wuhan University, Department of Mathematics,__  
+Wuhan, China  
+Area of Study: Arithmetic Geometry  
+Advisor: Jiangwei Xue  
+Master of Science  
+Sep, 2015–June, 2018
 
-See a [live version of Moon](http://taylantatli.github.io/Moon) hosted on GitHub.
 
-## Getting Started
+## VISITING EXPERIENCE
+The Institute of Mathematics, Academia Sinica, Taiwan, Oct 01–Dec 31, 2017
 
-To learn how to install and use this theme check out the [Setup Guide](http://taylantatli.me/Moon/moon-theme/) for more information.
-      
-[Install Moon](https://github.com/TaylanTatli/Moon){: .btn}
+
+## TEACHING ASSISTANT
+In fall 2016, I was a TA for the undergraduate course Commutative Algebra and I supervised the recitation class.
