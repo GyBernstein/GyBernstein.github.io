@@ -10,7 +10,7 @@ comments: false
 **Department of Mathematics**  
 _Franklin College of Arts and Sciences_  
 **UNIVERSITY OF GEORGIA**  
-***
+___
 
 ## EDUCATION
 * __Shandong University, Department of Mathematics,__  
