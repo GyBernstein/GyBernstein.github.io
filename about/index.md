@@ -24,6 +24,7 @@ Bachelor of Science
 Sep, 2011 – June, 2015
 
 ## WORKING EXPERIENCE
+* __Penghai Soft__
 Qingdao, Shandong, China  
 Java Developer  
 July, 2015 - now
