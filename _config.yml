@@ -1,13 +1,13 @@
 # Site
-title:              Moon
-bio:                'Minimal, one column jekyll theme.'
-description:        "Moon is a minimal, one column jekyll theme for your blog."
+title:              高源
+bio:                '算是个程序员吧。'
+description:        "一个有些无聊，时不时挣扎一下的人。闲下来总会胡乱想"
 reading_time:       true
 words_per_minute:   200
 logo:               'assets/img/logo.png'
 background:         'assets/img/placeholder-big.jpg'
 tiled_bg:           false   # Set this true if you want to tile your background image, otherwise it will be covered
-locale:             en_US
+locale:             zh_CN
 url:                https://gybernstein.github.io
 
 # Jekyll
@@ -26,7 +26,7 @@ sass:
   style:            compressed
 
 # Comments
-disqus_shortname:   taylantatli
+# disqus_shortname:   taylantatli
 
 # Social
 # if you don't have any of social below, comment the line.
@@ -38,9 +38,9 @@ disqus_shortname:   taylantatli
   #ad-slot:
 #bing-verify:
 email:              sddxgaoyuan@163.com
-twitter:            username
-facebook:           username
-github-url:         username
+#twitter:            username
+#facebook:           username
+github-url:         GyBernstein
 #stackoverflow:     123456/username   from a "http://stackoverflow.com/users/123456/username" link
 #linkedin:          username
 #xing:              username
@@ -50,7 +50,7 @@ github-url:         username
 #medium:            '@username'
 #pinterest:         username
 #foursquare:        username
-steam:              username
+steam:              ay_bernstein
 #dribbble:          username
 #youtube:           username
 #youtube-channel:   channel
