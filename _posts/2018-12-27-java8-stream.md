@@ -32,13 +32,16 @@ stream的另外一大特点，数据源本身可以是无限的，看完你就�
 
 ### 从BufferReader
 * java.io.BufferedReader.lines()
+
 ### 静态工厂
 * java.util.stream.IntStream.range()
 * java.nio.file.Files.walk()
+
 ### 自己构建
 * java.util.Spliterator
 * Stream.generate(java.util.Supplier<T>)
 * Stream.iterate(seed, f())
+
 ### 其他
 * Random.ints()
 * BigSet.stream()
