@@ -10,6 +10,7 @@ tag:
 comments: true
 ---
 
+
 ## 什么是Stream
 Stream 不是集合元素，它不是数据结构并不保存数据，它是有关算法和计算的，更像一个高级版本的Iterator。  
 单向，不可往复，数据只能遍历一次，像流水不复返。  
@@ -141,3 +142,104 @@ for (Person p : roster) {
     }
 }
 ~~~
+一般认为，forEach 和常规 for 循环的差异不涉及到性能，它们仅仅是函数式风格与传统 Java 风格的差别。个人认为，处理少量数据的时候，可能还是for循环比较快，对于大量数据，还是stream高效稳定。  
+
+如果想要循环几遍，进行不同的操作，可以使用peek，peek对每个元素执行操作并返回一个新的stream：
+~~~ java
+Stream.of("one", "two", "three", "four")
+ .filter(e -> e.length() > 3)
+ .peek(e -> System.out.println("Filtered value: " + e)) // 可以替换为别的功能函数
+ .map(String::toUpperCase)
+ .peek(e -> System.out.println("Mapped value: " + e))
+ .collect(Collectors.toList());
+ ~~~
+
+forEach 不能修改自己包含的本地变量值，也不能用 break/return 之类的关键字提前结束循环。  
+
+__findFirst__  
+
+这是一个 termimal 兼 short-circuiting 操作，它总是返回 Stream 的第一个元素，或者空。  
+
+这里比较重点的是它的返回值类型：Optional。这也是一个模仿 Scala 语言中的概念，作为一个容器，它可能含有某值，或者不包含。使用它的目的是尽可能避免 NullPointerException。  
+
+~~~ java
+public static int getLength(String text) {
+	// Java 8
+	return Optional.ofNullable(text).map(String::length).orElse(-1);
+	// Pre-Java 8
+	// return if (text != null) ? text.length() : -1;
+ };
+ ~~~
+ 在更复杂的 if (xx != null) 的情况中，使用 Optional 代码的可读性更好，而且它提供的是编译时检查，能极大的降低 NPE 这种 Runtime Exception 对程序的影响，或者迫使程序员更早的在编码阶段处理空值问题，而不是留到运行时再发现和调试。
+Stream 中的 findAny、max/min、reduce 等方法等返回 Optional 值。还有例如 IntStream.average() 返回 OptionalDouble 等等。
+
+
+__reduce__  
+
+这个方法的主要作用是把 Stream 元素组合起来。  
+没有起始值的情况，这时会把 Stream 的前面两个元素组合起来，返回的是 Optional，有起始值时返回具体对象。  
+可以返回一个值，或者对象（list等也是对象），对于reduce解决不了的，可以考虑自定义collector 
+
+关于入参，套路差不多，第一个参数是初始值/返回类型容器，可不填。第二个参数是线程内两个元素合并的方法，返回新元素，必填。第三个参数是并行时不同线程运算结果合并的方法，可不填。  
+定义collector时多了第四个参数，指定返回什么。
+
+eg. reduce的用例
+~~~ java
+// 字符串连接，concat = "ABCD"
+String concat = Stream.of("A", "B", "C", "D").reduce("", String::concat); 
+// 求最小值，minValue = -3.0
+double minValue = Stream.of(-1.5, 1.0, -3.0, -2.0).reduce(Double.MAX_VALUE, Double::min); 
+// 求和，sumValue = 10, 有起始值
+int sumValue = Stream.of(1, 2, 3, 4).reduce(0, Integer::sum);
+// 求和，sumValue = 10, 无起始值
+sumValue = Stream.of(1, 2, 3, 4).reduce(Integer::sum).get();
+// 过滤，字符串连接，concat = "ace"
+concat = Stream.of("a", "B", "c", "D", "e", "F").
+ filter(x -> x.compareTo("Z") > 0).
+ reduce("", String::concat);
+ ~~~
+
+__limit/skip__  
+
+limit 返回 Stream 的前面 n 个元素；skip 则是扔掉前 n 个元素（它是由一个叫 subStream 的方法改名而来）。
+目的有两种，一种是达到short-circuiting目的，减少操作次数；另一种是选取一部分结果。  
+当然，先排序，再limit是不会减少操作次数的，但不要求排序后再取值，这在正常的业务逻辑中是不常见的。  
+有一点需要注意的是，对一个 parallel 的 Steam 管道来说，如果其元素是有序的，那么 limit 操作的成本会比较大，因为它的返回对象必须是前 n 个也有一样次序的元素。取而代之的策略是取消元素间的次序，或者不要用 parallel Stream。
+
+__sorted__  
+
+对 Stream 的排序通过 sorted 进行，它比数组的排序更强之处在于你可以首先对 Stream 进行各类 map、filter、limit、skip 甚至 distinct 来减少元素数量后，再排序，这能帮助程序明显缩短执行时间。  
+
+当然，这种优化是有 business logic 上的局限性的：即不要求排序后再取值。
+eg. 排序前进行 limit 和 skip
+~~~ java
+List<Person> persons = new ArrayList();
+ for (int i = 1; i <= 5; i++) {
+	Person person = new Person(i, "name" + i);
+	persons.add(person);
+ }
+List<Person> personList2 = persons.stream().limit(2).sorted((p1, p2) -> p1.getName().compareTo(p2.getName())).collect(Collectors.toList());
+System.out.println(personList2);
+~~~
+
+__min/max/distinct__  
+
+min 和 max 的功能也可以通过对 Stream 元素先排序，再 findFirst 来实现，但前者的性能会更好，为 O(n)，而 sorted 的成本是 O(n log n)。同时它们作为特殊的 reduce 方法被独立出来也是因为求最大最小值是很常见的操作。
+
+__Match__  
+
+Stream 有三个 match 方法，从语义上说：
+* allMatch：Stream 中全部元素符合传入的 predicate，返回 true
+* anyMatch：Stream 中只要有一个元素符合传入的 predicate，返回 true
+* noneMatch：Stream 中没有一个元素符合传入的 predicate，返回 true  
+
+它们都不是要遍历全部元素才能返回结果。例如 allMatch 只要一个元素不满足条件，就 skip 剩下的所有元素，返回 false。
+
+
+
+
+
+参考链接：  
+[Java 8 中的 Streams API 详解](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)   
+[Java中对List去重, Stream去重](https://www.cnblogs.com/woshimrf/p/java-list-distinct.html)  
+[JAVA8-LAMBDA中reduce的用法](https://blog.csdn.net/zhang89xiao/article/details/77164866)
