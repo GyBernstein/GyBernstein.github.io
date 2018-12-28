@@ -235,7 +235,86 @@ Stream 有三个 match 方法，从语义上说：
 
 它们都不是要遍历全部元素才能返回结果。例如 allMatch 只要一个元素不满足条件，就 skip 剩下的所有元素，返回 false。
 
+## 进阶
+### 自己生成流
+* Stream.generate  
 
+通过实现 Supplier 接口，你可以自己来控制流的生成。这种情形通常用于随机数、常量的 Stream，或者需要前后元素间维持着某种状态信息的 Stream。由于它是无限的，在管道中，必须利用 limit 之类的操作限制 Stream 大小。
+
+eg. 生成 10 个随机整数
+~~~ java
+Supplier<Integer> random = seed::nextInt;
+Stream.generate(random).limit(10).forEach(System.out::println);
+//Another way
+IntStream.generate(() -> (int) (System.nanoTime() % 100)).
+limit(10).forEach(System.out::println);
+~~~
+
+Stream.generate() 还接受自己实现的 Supplier  
+eg. 自实现 Supplier
+~~~ java
+Stream.generate(new PersonSupplier()).
+limit(10).
+forEach(p -> System.out.println(p.getName() + ", " + p.getAge()));
+private class PersonSupplier implements Supplier<Person> {
+ private int index = 0;
+ private Random random = new Random();
+ @Override
+ public Person get() {
+ return new Person(index++, "StormTestUser" + index, random.nextInt(100));
+ }
+}
+~~~
+
+eg. jenetics的Engine
+
+* Stream.iterate  
+
+iterate 跟 reduce 操作很像，接受一个种子值，和一个 UnaryOperator（例如 f）。然后种子值成为 Stream 的第一个元素，f(seed) 为第二个，f(f(seed)) 第三个，以此类推。  
+eg. 生成一个等差数列
+~~~ java
+Stream.iterate(0, n -> n + 3).limit(10). forEach(x -> System.out.print(x + " "));
+~~~
+
+### 用 Collectors 来进行 reduction 操作
+java.util.stream.Collectors 类的主要作用就是辅助进行各类有用的 reduction 操作，例如转变输出为 Collection，把 Stream 元素进行归组。  
+* groupingBy/partitioningBy  
+eg. 按照年龄分组  
+~~~ java 
+Map<Integer, List<Person>> personGroups = Stream.generate(new PersonSupplier()).
+ limit(100).
+ collect(Collectors.groupingBy(Person::getAge));
+Iterator it = personGroups.entrySet().iterator();
+while (it.hasNext()) {
+ Map.Entry<Integer, List<Person>> persons = (Map.Entry) it.next();
+ System.out.println("Age " + persons.getKey() + " = " + persons.getValue().size());
+}
+~~~ 
+eg. 按照未成年人和成年人归组
+~~~ java
+Map<Boolean, List<Person>> children = Stream.generate(new PersonSupplier()).
+ limit(100).
+ collect(Collectors.partitioningBy(p -> p.getAge() < 18));
+System.out.println("Children number: " + children.get(true).size());
+System.out.println("Adult number: " + children.get(false).size());
+~~~
+partitioningBy 其实是一种特殊的 groupingBy，它依照条件测试的是否两种结果来构造返回的数据结构，get(true) 和 get(false) 能即为全部的元素对象。
+
+## 特性归纳
+* 不是数据结构
+* 它没有内部存储，它只是用操作管道从 source（数据结构、数组、generator function、IO channel）抓取数据。
+* 它也绝不修改自己所封装的底层数据结构的数据。例如 Stream 的 filter 操作会产生一个不包含被过滤元素的新 Stream，而不是从 source 删除那些元素。
+* 所有 Stream 的操作必须以 lambda 表达式为参数
+* 不支持索引访问
+* 你可以请求第一个元素，但无法请求第二个，第三个，或最后一个。不过请参阅下一项。
+很容易生成数组或者 List
+* 惰性化
+* 很多 Stream 操作是向后延迟的，一直到它弄清楚了最后需要多少数据才会开始。
+* Intermediate 操作永远是惰性化的。
+* 并行能力
+* 当一个 Stream 是并行化的，就不需要再写多线程代码，所有对它的操作会自动并行进行的。
+* 可以是无限的
+* 集合有固定大小，Stream 则不必。limit(n) 和 findFirst() 这类的 short-circuiting 操作可以对无限的 Stream 进行运算并很快完成。
 
 
 
