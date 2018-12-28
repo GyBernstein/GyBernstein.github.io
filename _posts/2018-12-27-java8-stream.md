@@ -309,7 +309,7 @@ users.parallelStream().distinct().forEach(System.out::println);
 __自定义方法__
 对于复杂对象，由于 distinct() 根据 Object#equals(Object) 去重，所以即便两个对象业务意义上一样，甚至各个属性都相同，但也会被认为不一样，这时候有两种做法
 * 重写 hashCode() 和 equals()
-例如要根据user的id来去重：
+例如要根据user的id来去重：  
 ~~~ java
 @Override
 public boolean equals(Object o) {
