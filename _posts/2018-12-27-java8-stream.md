@@ -300,6 +300,58 @@ System.out.println("Adult number: " + children.get(false).size());
 ~~~
 partitioningBy 其实是一种特殊的 groupingBy，它依照条件测试的是否两种结果来构造返回的数据结构，get(true) 和 get(false) 能即为全部的元素对象。
 
+### 去重
+__distinct__  
+对于基本类型，可以用 distinct 实现去重  
+~~~ java
+users.parallelStream().distinct().forEach(System.out::println);
+~~~
+__自定义方法__
+对于复杂对象，由于 distinct() 根据 Object#equals(Object) 去重，所以即便两个对象业务意义上一样，甚至各个属性都相同，但也会被认为不一样，这时候有两种做法
+* 重写 hashCode() 和 equals()
+例如要根据user的id来去重：
+~~~ java
+@Override
+public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    User user = (User) o;
+    return Objects.equals(id, user.id);
+}
+
+@Override
+public int hashCode() {
+    return Objects.hash(id);
+}
+
+
+//hashcode
+result = 31 * result + (element == null ? 0 : element.hashCode());
+~~~
+
+这里是依然调用 distinct() 来达到去重的目的
+
+* 自定义方法  
+思路上还是使用 set 来实现，内置一个 set，向其中添加即可，返回false，证明为重复的，借助 filter 方法将其过滤掉。    
+~~~ java
+public void dis3() {
+    users.parallelStream().filter(distinctByKey(User::getId))
+        .forEach(System.out::println);
+}
+
+
+public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+    Set<Object> seen = ConcurrentHashMap.newKeySet();
+    return t -> seen.add(keyExtractor.apply(t));
+}
+~~~
+这种做法无侵入性，感觉还是不错的。
+
+
 ## 特性归纳
 * 不是数据结构
 * 它没有内部存储，它只是用操作管道从 source（数据结构、数组、generator function、IO channel）抓取数据。
