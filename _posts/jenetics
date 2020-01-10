@@ -1,0 +1,23 @@
+based on java8 stream
+
+concepts:
+
+main steps:
+1. transfer: 大概是最有挑战的部分，设置一个将问题转化成Genotype(factory)表示的Engine.
+2. define fitness function
+3. create the evolution Engine: highly configurable, 很高的配置性，使用参数控制进化和计算的环境，设置不同的alterers 和 selectors 可以改变进化表现。修改Executor可以控制使用线程的数量。
+4. create a new EvolutionStream from our Engine
+
+stream collector
+
+算法流程：
+ 1 P0 ← Pinitial 
+ 2 F(P0) 
+ 3 while !finished do 
+ 4 g ← g +1 
+ 5 Sg ← selectS(Pg−1) 
+ 6 Og ← selectO(Pg−1) 
+ 7 Og ← alter(Og) 
+ 8 Pg ← filter[gi ≥ gmax](Sg)+filter[gi ≥ gmax](Og) 
+ 9 F(Pg) 
+
